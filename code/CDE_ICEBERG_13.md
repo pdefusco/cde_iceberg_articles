@@ -19,8 +19,7 @@ With the release of CDE 1.20 the CDE Runtime has been updated with Apache Iceber
 
 ```
 cde resource create --name myFiles --type files
-cde resource upload --name myFiles --local-path resources/cell_towers_1.csv
-cde resource upload --name myFiles --local-path resources/cell_towers_2.csv
+cde resource upload --name myFiles --local-path resources/cell_towers_1.csv --local-path resources/cell_towers_2.csv
 ```
 
 #### Launch CDE Session & Run Spark Commands
@@ -36,7 +35,7 @@ cde session interact --name icebergSession
 USERNAME = "pauldefusco"
 
 df  = spark.read.csv("/app/mount/cell_towers_1.csv", header=True, inferSchema=True)
-df.writeTo("CELL_TOWERS_{USERNAME}").using("iceberg").tableProperty("write.format.default", "parquet").createOrReplace()
+df.writeTo("CELL_TOWERS_{}".format(USERNAME)).using("iceberg").tableProperty("write.format.default", "parquet").createOrReplace()
 ```
 
 ### Working with Iceberg Table Branches
@@ -44,13 +43,13 @@ df.writeTo("CELL_TOWERS_{USERNAME}").using("iceberg").tableProperty("write.forma
 ##### Create Iceberg Table Branch
 
 ```
-# CREATE TABLE BRANCH
-spark.sql("ALTER TABLE CELL_TOWERS_{USERNAME} \
+# CREATE TABLE BRANCH - Skip: Not supported
+spark.sql("ALTER TABLE CELL_TOWERS_{} \
   CREATE BRANCH ingestion_branch \
   RETAIN 7 DAYS \
-  WITH RETENTION 2 SNAPSHOTS;")
+  WITH RETENTION 2 SNAPSHOTS;".format(USERNAME))
 
-# SET TABLE BRANCH AS ACTIVE
+# SET TABLE BRANCH AS ACTIVE - Skip: Not supported
 spark.sql("SET spark.wap.branch = 'ingestion_branch';")
 ```
 
@@ -60,30 +59,24 @@ spark.sql("SET spark.wap.branch = 'ingestion_branch';")
 # LOAD NEW TRANSACTION BATCH
 batchDf = spark.read.csv("/app/mount/cell_towers_2.csv", header=True, inferSchema=True)
 batchDf.printSchema()
-batchDf.createOrReplaceTempView("BATCH_TEMP_VIEW".format(username))
+batchDf.createOrReplaceTempView("BATCH_TEMP_VIEW".format(USERNAME))
 
-# RUN MERGE INTO
-ICEBERG_MERGE_INTO = """
-    MERGE INTO CELL_TOWERS_{USERNAME}.ingestion_branch c USING (SELECT * FROM BATCH_TEMP_VIEW) t
-   ON c.device_id = t.device_id AND
-   c.manufacturer = t.manufacturer AND
-   c.event_type = t.event_type
-  WHEN MATCHED THEN UPDATE SET * WHEN NOT MATCHED THEN INSERT *
-  """
-
-spark.sql(ICEBERG_MERGE_INTO)
+# CREATE TABLE BRANCH - Supported
+spark.sql("ALTER TABLE CELL_TOWERS_{} CREATE BRANCH ingestion_branch".format(USERNAME))
+# WRITE DATA OPERATION ON TABLE BRANCH - Supported
+batchDf.write.format("iceberg").option("branch", "ingestion_branch").mode("append").save("CELL_TOWERS_{}".format(USERNAME))
 ```
 
 Notice that a simple SELECT query against the table still returns the original data.
 
 ```
-spark.sql("SELECT * FROM CELL_TOWERS_{USERNAME};").show()
+spark.sql("SELECT * FROM CELL_TOWERS_{};".format(USERNAME)).show()
 ```
 
 If you want to access the data in the branch, you can specify the branch name in your SELECT query.
 
 ```
-spark.sql("SELECT * FROM CELL_TOWERS_{USERNAME}.ingestion_branch;").show()
+spark.sql("SELECT * FROM CELL_TOWERS_{} VERSION AS OF 'ingestion_branch';".format(USERNAME)).show()
 ```
 
 We can use the "fast forward" routine to incorporate validated changes from the new branch.
@@ -99,7 +92,7 @@ Track table snapshots post Merge Into operation:
 
 ```
 # QUERY ICEBERG METADATA HISTORY TABLE
-spark.sql("SELECT * FROM spark_catalog.{}.TRX_TABLE.snapshots".format(username)).show(20, False)
+spark.sql("SELECT * FROM CELL_TOWERS_{}.snapshots".format(USERNAME)).show(20, False)
 ```
 
 
@@ -108,10 +101,10 @@ spark.sql("SELECT * FROM spark_catalog.{}.TRX_TABLE.snapshots".format(username))
 ##### Create Table Tag
 
 ```
-spark.sql("ALTER TABLE CELL_TOWERS_{USERNAME}
+spark.sql("ALTER TABLE CELL_TOWERS_{}
   CREATE TAG 'business-unit-tag'
   AS OF VERSION 8
-  RETAIN 14 DAYS;")
+  RETAIN 14 DAYS;".format(USERNAME))
 ```
 
 Select your table snapshot as of a particular tag:
