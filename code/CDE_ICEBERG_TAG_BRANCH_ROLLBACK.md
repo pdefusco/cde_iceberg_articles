@@ -95,32 +95,72 @@ Track table snapshots post Merge Into operation:
 spark.sql("SELECT * FROM CELL_TOWERS_{}.snapshots".format(USERNAME)).show(20, False)
 ```
 
+### Cherrypicking Snapshots
+
+The cherrypick_snapshot procedure creates a new snapshot incorporating the changes from another snapshot in a metadata-only operation (no new datafiles are created). To run the cherrypick_snapshot procedure you need to provide two parameters: the name of the table you’re updating as well as the ID of the snapshot the table should be updated based on. This transaction will return the snapshot IDs before and after the cherry-pick operation as source_snapshot_id and current_snapshot_id.
+
+we will use the cherrypick operation to commit the changes to the table which were staged in the 'ingestion_branch' branch up until now.
+
+```
+# SHOW PAST BRANCH SNAPSHOT ID'S
+spark.sql("SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{}.refs;".format(USERNAME)).show()
+
+# SAVE THE SNAPSHOT ID CORRESPONDING TO THE CREATED BRANCH
+branchSnapshotId = spark.sql("SELECT snapshot_id FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{}.refs WHERE NAME == 'ingestion_branch';".format(USERNAME)).collect()[0][0]
+
+# USE THE PROCEDURE TO CHERRY-PICK THE SNAPSHOT
+# THIS IMPLICITLY SETS THE CURRENT TABLE STATE TO THE STATE DEFINED BY THE CHOSEN PRIOR SNAPSHOT ID
+spark.sql("CALL spark_catalog.system.cherrypick_snapshot('SPARK_CATALOG.DEFAULT.CELL_TOWERS_{0}',{1})".format(USERNAME, branchSnapshotId))
+
+# VALIDATE THE CHANGES
+# THE TABLE ROW COUNT IN THE CURRENT TABLE STATE REFLECTS THE APPEND OPERATION - IT PREVIOSULY ONLY DID BY SELECTING THE BRANCH
+spark.sql("SELECT COUNT(*) FROM CELL_TOWERS_{};".format(USERNAME)).show()
+```
+
 
 ### Working with Iceberg Table Tags
 
 ##### Create Table Tag
 
+Tags are immutable labels for Iceberg Snapshot ID's and can be used to reference a particular version of the table via a simple tag rather than having to work with Snapshot ID's directly.   
+
 ```
-spark.sql("ALTER TABLE CELL_TOWERS_{}
-  CREATE TAG 'business-unit-tag'
-  AS OF VERSION 8
-  RETAIN 14 DAYS;".format(USERNAME))
+spark.sql("ALTER TABLE SPARK_CATALOG.DEFAULT.CELL_TOWERS_{} CREATE TAG businessOrg RETAIN 365 DAYS".format(USERNAME)).show()
 ```
 
 Select your table snapshot as of a particular tag:
 
 ```
-spark.sql("SELECT * FROM prod.db.table VERSION AS OF 'historical-snapshot';").show()
+spark.sql("SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{} VERSION AS OF 'businessOrg';".format(USERNAME)).show()
 ```
 
-##### Rollback Table to previous Tag
+
+### Table Rollbacks
+
+##### Rollback Table to previous Snapshot
 
 Rollback table to state prior to merge into.
 
 ```
+# SHOW LASTEST TABLE HISTORY
+spark.sql("SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{}.HISTORY;".format(USERNAME)).show()
+
+# SELECT SECOND LAST SNAPSHOT ID FROM HISTORY
+priorSnapshotId = spark.sql("SELECT MIN(SNAPSHOT_ID) FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{}.HISTORY".format(USERNAME)).collect()[0][0]
+
 # REPLACE ICEBERG SNAPSHOT ID WITH VALUE OBTAINED ABOVE
-icebergSnapshotId = ""
-spark.sql("CALL catalog.database.rollback_to_snapshot('orders', 12345)")
+spark.sql("CALL SPARK_CATALOG.rollback_to_snapshot('DEFAULT.CELL_TOWERS_{0}', {1})".format(USERNAME, priorSnapshotId))
+
+# VALIDATE ROLLBACK BY VERIFYING TABLE COUNT
+spark.sql("SELECT COUNT(*) FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{}".format(USERNAME)).show()
+```
+
+### The refs Metadata Table
+
+The refs metadata table helps you understand and manage your table’s snapshot history and retention policy, making it a crucial part of maintaining data versioning and ensuring that your table’s size is under control. Among its many use cases, the table provides a list of all the named references within an Iceberg table sich as Branch names and corresponding Snapshot ID's.
+
+```
+spark.sql("SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{}.refs;".format(USERNAME)).show()
 ```
 
 
