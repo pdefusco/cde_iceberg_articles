@@ -1,6 +1,10 @@
 # New Features in Apache Iceberg 1.3
 
-With the release of CDE 1.20 the CDE Runtime has been updated with Apache Iceberg 1.3. This version introduces three features that provide great benefits to Data Engineers.
+CDP Data Engineering (CDE) is the only cloud-native service purpose-built for enterprise data engineering teams. Building on Apache Spark, Data Engineering is an all-inclusive data engineering toolset that enables orchestration automation with Apache Airflow, advanced pipeline monitoring, visual troubleshooting, and comprehensive management tools to streamline ETL processes across enterprise analytics teams.
+
+Apache Iceberg is an open table format format for huge analytic datasets. It provides features that, coupled with Spark as the compute engine, allows you to build data processing pipelines with dramatic gains in terms of scalability, performance, and overall developer productivity.
+
+CDE Provides native Iceberg support. With the release of CDE 1.20 the Spark Runtime has been updated with Apache Iceberg 1.3. This version introduces new features that provide great benefits to Data Engineers.
 
 1. Table Branching: ability to create independent lineages of snapshots, each with its own lifecycle.
 2. Table Tagging: ability to tag an Iceberg table snapshot.
@@ -13,7 +17,9 @@ With the release of CDE 1.20 the CDE Runtime has been updated with Apache Iceber
 
 ## Step by Step Instructions
 
-### Prerequisites
+### Requirements
+
+* A CDE Service in Private or Public Cloud on version 1.21 or above.
 
 #### Create CDE Files Resource
 
