@@ -4,7 +4,7 @@ CDP Data Engineering (CDE) is the only cloud-native service purpose-built for en
 
 Apache Iceberg is an open table format format for huge analytic datasets. It provides features that, coupled with Spark as the compute engine, allows you to build data processing pipelines with dramatic gains in terms of scalability, performance, and overall developer productivity.
 
-CDE Provides native Iceberg support. With the release of CDE 1.20 the Spark Runtime has been updated with Apache Iceberg 1.3. This version introduces new features that provide great benefits to Data Engineers.
+CDE Provides native Iceberg support. With the release of CDE 1.20 the Spark Runtime has been updated with Apache Iceberg 1.3. This version introduces three features that provide great benefits to Data Engineers.
 
 1. Table Branching: ability to create independent lineages of snapshots, each with its own lifecycle.
 2. Table Tagging: ability to tag an Iceberg table snapshot.
@@ -17,9 +17,7 @@ CDE Provides native Iceberg support. With the release of CDE 1.20 the Spark Runt
 
 ## Step by Step Instructions
 
-### Requirements
-
-* A CDE Service in Private or Public Cloud on version 1.21 or above.
+### Prerequisites
 
 #### Create CDE Files Resource
 
@@ -85,20 +83,10 @@ If you want to access the data in the branch, you can specify the branch name in
 spark.sql("SELECT * FROM CELL_TOWERS_{} VERSION AS OF 'ingestion_branch';".format(USERNAME)).show()
 ```
 
-We can use the "fast forward" routine to incorporate validated changes from the new branch.
+Notice that a simple select against the table still returns the original data.
 
 ```
-table
-  .manageSnapshots()
-  .fastForward("main", "ingestion_branch")
-  .commit();
-```
-
-Track table snapshots post Merge Into operation:
-
-```
-# QUERY ICEBERG METADATA HISTORY TABLE
-spark.sql("SELECT * FROM CELL_TOWERS_{}.snapshots".format(USERNAME)).show(20, False)
+spark.sql("SELECT COUNT(*) FROM CELL_TOWERS_{};".format(USERNAME)).show()
 ```
 
 ### Cherrypicking Snapshots
@@ -123,6 +111,12 @@ spark.sql("CALL spark_catalog.system.cherrypick_snapshot('SPARK_CATALOG.DEFAULT.
 spark.sql("SELECT COUNT(*) FROM CELL_TOWERS_{};".format(USERNAME)).show()
 ```
 
+Track table snapshots post Merge Into operation:
+
+```
+# QUERY ICEBERG METADATA HISTORY TABLE
+spark.sql("SELECT * FROM CELL_TOWERS_{}.snapshots".format(USERNAME)).show(20, False)
+```
 
 ### Working with Iceberg Table Tags
 
@@ -148,7 +142,7 @@ spark.sql("SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{} VERSION AS OF 'bus
 Rollback table to state prior to merge into.
 
 ```
-# SHOW LASTEST TABLE HISTORY
+# SHOW LATEST TABLE HISTORY
 spark.sql("SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_{}.HISTORY;".format(USERNAME)).show()
 
 # SELECT SECOND LAST SNAPSHOT ID FROM HISTORY
