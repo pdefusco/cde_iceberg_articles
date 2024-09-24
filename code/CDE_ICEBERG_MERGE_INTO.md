@@ -86,6 +86,10 @@ Cloudera Data Engineering (CDE) and the broader Cloudera Data Platform (CDP) off
 
 Here is a list of helpful articles and blogs related to Cloudera Data Engineering and Apache Iceberg:
 
+- **Cloudera on Public Cloud 5-Day Free Trial**
+   Experience Cloudera Data Engineering through common use cases that also introduce you to the platform’s fundamentals and key capabilities with predefined code samples and detailed step by step instructions.
+   [Try Cloudera on Public Cloud for free](https://www.cloudera.com/products/cloudera-public-cloud-trial.html?utm_medium=sem&utm_source=google&keyplay=ALL&utm_campaign=FY25-Q2-GLOBAL-ME-PaidSearch-5-Day-Trial%20&cid=701Hr000001fVx4IAE&gad_source=1&gclid=EAIaIQobChMI4JnvtNHciAMVpAatBh2xRgugEAAYASAAEgLke_D_BwE)
+
 - **Cloudera Blog: Supercharge Your Data Lakehouse with Apache Iceberg**  
    Learn how Apache Iceberg integrates with Cloudera Data Platform (CDP) to enable scalable and performant data lakehouse solutions, covering features like in-place table evolution and time travel.  
    [Read more on Cloudera Blog](https://blog.cloudera.com/supercharge-your-data-lakehouse-with-apache-iceberg-in-cloudera-data-platform/)
@@ -97,5 +101,3 @@ Here is a list of helpful articles and blogs related to Cloudera Data Engineerin
 - **Cloudera Blog: Building an Open Data Lakehouse Using Apache Iceberg**  
    This article covers how to build and optimize a data lakehouse architecture using Apache Iceberg in CDP, along with advanced features like partition evolution and time travel queries.  
    [Read more on Cloudera Blog](https://blog.cloudera.com/how-to-use-apache-iceberg-in-cdp-open-lakehouse/)
-
-These resources will give you a deep dive into how Cloudera Data Engineering leverages Apache Iceberg for scalable, efficient data management.
