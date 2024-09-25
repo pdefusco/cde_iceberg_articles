@@ -65,17 +65,17 @@ df2.writeTo("CELL_TOWERS_RIGHT_{}".format(USERNAME)).using("iceberg").tablePrope
 
 ```
 # PRE-MERGE COUNTS BY TRANSACTION TYPE:
-spark.sql("""SELECT COUNT(id) FROM CELL_TOWERS_LEFT_{} GROUP BY event_type""".format(username)).show()
+spark.sql("""SELECT COUNT(id) FROM CELL_TOWERS_LEFT_{} GROUP BY event_type""".format(USERNAME)).show()
 
 # MERGE OPERATION
-spark.sql("""MERGE INTO CELL_TOWERS_LEFT_{} t   
-USING (SELECT * FROM CELL_TOWERS_RIGHT_{}) s          
+spark.sql("""MERGE INTO CELL_TOWERS_LEFT_{0} t   
+USING (SELECT * FROM CELL_TOWERS_RIGHT_{0}) s          
 ON t.id = s.id               
 WHEN MATCHED AND t.longitude < -70 AND t.latitude > 50 AND t.manufacturer == "TelecomWorld" THEN UPDATE SET t.event_type = "invalid"
-WHEN NOT MATCHED THEN INSERT *""".format(username))
+WHEN NOT MATCHED THEN INSERT *""".format(USERNAME))
 
 # POST-MERGE COUNTS:
-spark.sql("""SELECT COUNT(id) FROM CELL_TOWERS_LEFT_{} GROUP BY EVENT_TYPE""".format(username)).show()
+spark.sql("""SELECT COUNT(id) FROM CELL_TOWERS_LEFT_{} GROUP BY EVENT_TYPE""".format(USERNAME)).show()
 ```
 
 ## Summary
