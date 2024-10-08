@@ -19,6 +19,8 @@ In this tutorial you will create a CDE Session and interact with Apache Iceberg 
 * CDE Virtual Cluster of type "All-Purpose" running in CDE Service with version 1.22 or above, and Spark version 3.2 or above.
 * An installation of the CDE CLI is recommended but optional. In the steps below you will create the CDE Session using the CLI, but you can alternatively launch one using the UI.
 
+## Step by Step Guide
+
 #### Create CDE Files Resource
 
 ```
