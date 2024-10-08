@@ -45,8 +45,8 @@ cde resource upload --name myFiles --local-path resources/cell_towers_1.csv --lo
 #### Launch CDE Session & Run Spark Commands
 
 ```
-cde session create --name icebergSession --type pyspark --mount-1-resource myFiles
-cde session interact --name icebergSession
+cde session create --name icebergSessionCDE --type pyspark --mount-1-resource myFiles
+cde session interact --name icebergSessionCDE
 ```
 
 ##### Create Iceberg Table
