@@ -280,3 +280,7 @@ Here is a list of helpful articles and blogs related to Cloudera Data Engineerin
 - **Cloudera Blog: Building an Open Data Lakehouse Using Apache Iceberg**  
    This article covers how to build and optimize a data lakehouse architecture using Apache Iceberg in CDP, along with advanced features like partition evolution and time travel queries.  
    [Read more on Cloudera Blog](https://blog.cloudera.com/how-to-use-apache-iceberg-in-cdp-open-lakehouse/)
+
+- **Compatibility for Cloudera Data Engineering and Runtime Components**
+  Learn about Cloudera Data Engineering (CDE) and compatibility for Runtime components across different versions. This document also includes component version compatibility information for AWS Graviton.
+  [REad more in the Cloudera Documentation](https://docs.cloudera.com/data-engineering/cloud/release-notes/topics/cde-dl-compatibility.html)
