@@ -2,7 +2,7 @@
 
 ## Objective
 
-This article provides an introduction to the Iceberg Merge Into using Spark SQL in Cloudera Data Engineering (CDE). CDE provides native Apache Iceberg Table Format support in its Spark Runtimes. Iceberg supports the Merge Into command, a great alternative to Spark upserts which will save you time and effort when running ETL jobs at scale.
+This article provides an introduction to the Iceberg using Spark SQL in Cloudera Data Engineering (CDE). CDE provides native Apache Iceberg Table Format support in its Spark Runtimes. This means you can create and interact with Iceberg Table format tables without any configurations.
 
 ## Abstract
 
