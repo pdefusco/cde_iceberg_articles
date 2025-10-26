@@ -21,7 +21,8 @@ Create CDE Depdendencies:
 
 ```
 cde resource create \
-  --name datagen-env
+  --name datagen-env \
+  --type python-env
 
 cde resource upload \
   --name datagen-env \
