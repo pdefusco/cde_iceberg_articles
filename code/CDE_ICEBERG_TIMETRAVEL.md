@@ -62,12 +62,12 @@ df2.writeTo("CELL_TOWERS_RIGHT_{}".format(USERNAME)).using("iceberg").tablePrope
 
 ```
 # PRE-APPEND COUNTS BY EVENT TYPE:
-spark.sql("""SELECT COUNT(id) FROM CELL_TOWERS_LEFT_{} GROUP BY event_type""".format(USERNAME)).show()
+spark.sql("""SELECT COUNT(id) FROM CELL_TOWERS_LEFT_{} GROUP BY EVENT_TYPE""".format(USERNAME)).show()
 
 # APPEND OPERATION WITH SPARK SQL
 spark.sql("""
-    INSERT INTO SPARK_CATALOG.DEFAULT.CELL_TOWERS_LEFT_{}
-    SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_RIGHT_{}
+    INSERT INTO SPARK_CATALOG.DEFAULT.CELL_TOWERS_LEFT_{0}
+    SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_RIGHT_{0}
 """.format(USERNAME))
 
 # POST-APPEND COUNTS BY EVENT TYPE:
@@ -89,18 +89,22 @@ snapshots_df.show()
 
 ```
 last_snapshot = snapshots_df.select("snapshot_id").tail(1)[0][0]
-#second_snapshot = snapshots_df.select("snapshot_id").collect()[1][0]
 first_snapshot = snapshots_df.select("snapshot_id").head(1)[0][0]
 
 incReadDf = spark.read\
     .format("iceberg")\
     .option("start-snapshot-id", first_snapshot)\
     .option("end-snapshot-id", last_snapshot)\
-    .load("SPARK_CATALOG.DEFAULT.CELL_TOWERS_LEFT_{}.snapshots".format(USERNAME))
+    .load("SPARK_CATALOG.DEFAULT.CELL_TOWERS_LEFT_{}".format(USERNAME))
 
 print("Incremental Report:")
 incReadDf.show()
+print("Incremental Read:")
+from pyspark.sql import functions as F
+incReadDf.groupBy("event_type").agg(F.count("*").alias("row_count")).show()
 ```
+
+The output of the incremental read reflects the rows that have changed between the two snapshots. Because the only rows affected were the rows appended, the output of the incremental read is identical to the data contained in the CELL_TOWERS_RIGHT table.
 
 ##### Drop Tables
 
