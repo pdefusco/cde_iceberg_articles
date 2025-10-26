@@ -31,7 +31,7 @@ cde resource create \
 cde resource upload \
     --name myFiles \
     --local-path resources/cell_towers_1.csv \
-    --local-path resources/cell_towers_2.csv
+    --local-path resources/cell_towers_3.csv
 ```
 
 #### Launch CDE Session & Run Spark Commands
@@ -54,24 +54,23 @@ USERNAME = "pauldefusco"
 df1  = spark.read.csv("/app/mount/cell_towers_1.csv", header=True, inferSchema=True)
 df1.writeTo("CELL_TOWERS_LEFT_{}".format(USERNAME)).using("iceberg").tableProperty("write.format.default", "parquet").createOrReplace()
 
-df2  = spark.read.csv("/app/mount/cell_towers_2.csv", header=True, inferSchema=True)
+df2  = spark.read.csv("/app/mount/cell_towers_3.csv", header=True, inferSchema=True)
 df2.writeTo("CELL_TOWERS_RIGHT_{}".format(USERNAME)).using("iceberg").tableProperty("write.format.default", "parquet").createOrReplace()
 ```
 
-##### Iceberg Merge Into
+##### Iceberg Append
 
 ```
-# PRE-MERGE COUNTS BY TRANSACTION TYPE:
+# PRE-APPEND COUNTS BY EVENT TYPE:
 spark.sql("""SELECT COUNT(id) FROM CELL_TOWERS_LEFT_{} GROUP BY event_type""".format(USERNAME)).show()
 
-# MERGE OPERATION
-spark.sql("""MERGE INTO CELL_TOWERS_LEFT_{0} t   
-USING (SELECT * FROM CELL_TOWERS_RIGHT_{0}) s          
-ON t.id = s.id               
-WHEN MATCHED AND t.longitude < -70 AND t.latitude > 50 AND t.manufacturer == "TelecomWorld" THEN UPDATE SET t.event_type = "invalid"
-WHEN NOT MATCHED THEN INSERT *""".format(USERNAME))
+# APPEND OPERATION WITH SPARK SQL
+spark.sql("""
+    INSERT INTO SPARK_CATALOG.DEFAULT.CELL_TOWERS_LEFT_{}
+    SELECT * FROM SPARK_CATALOG.DEFAULT.CELL_TOWERS_RIGHT_{}
+""".format(USERNAME))
 
-# POST-MERGE COUNTS:
+# POST-APPEND COUNTS BY EVENT TYPE:
 spark.sql("""SELECT COUNT(id) FROM CELL_TOWERS_LEFT_{} GROUP BY EVENT_TYPE""".format(USERNAME)).show()
 ```
 
