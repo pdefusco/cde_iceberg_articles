@@ -50,9 +50,8 @@ cde job create \
   --arg db_10M \
   --arg source_10M \
   --type spark \
-  --mount-1-resource files-spark32 \
+  --mount-1-resource files-spark35 \
   --application-file datagen.py \
-  --runtime-image-resource-name datagen-runtime \
   --executor-cores 4 \
   --executor-memory "4g"
 
@@ -92,7 +91,7 @@ df = spark.sql("select * from {0}.{1}".format(db_name, src_tbl))
 # Spark SQL Command:
 print(spark.sql("SHOW CREATE TABLE {0}.{1}".format(db_name, src_tbl)).collect()[0][0])
 
-# Expected Output:
+#### Expected Output:
 CREATE TABLE `db_10M`.`source_10M` (
   `unique_id` INT,
   `code` STRING,
