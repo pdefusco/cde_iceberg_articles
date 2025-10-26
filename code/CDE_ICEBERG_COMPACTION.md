@@ -15,6 +15,25 @@ In this tutorial you will create a CDE Session and interact with Apache Iceberg 
 
 ## Step by Step Instructions
 
+#### Create Unevenly Distributed Data
+
+```
+cde resource create \
+  --name datagen-env
+
+cde resource upload \
+  --name datagen-env \
+  --local-path compaction_resources/requirements.txt
+
+cde resource create \
+  --name files-spark35 \
+  --type files
+
+cde resource upload \
+  --name files-spark35 \
+  --local-path jobs/datagen.py
+```
+
 #### Look for Compaction Candidates
 
 How many files per partition?
