@@ -45,6 +45,7 @@ cde job delete \
 
 cde job create \
   --name datagen_10M \
+  --python-env-resource-name datagen-env \
   --arg 25 \
   --arg 25 \
   --arg 10000000 \
