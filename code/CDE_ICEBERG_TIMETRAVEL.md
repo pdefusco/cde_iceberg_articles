@@ -2,17 +2,11 @@
 
 ## Objective
 
-This article provides an introduction to the Iceberg using Spark SQL in Cloudera Data Engineering (CDE). CDE provides native Apache Iceberg Table Format support in its Spark Runtimes. This means you can create and interact with Iceberg Table format tables without any configurations.
+This article provides an introduction to Iceberg Time Travel using Spark SQL in Cloudera Data Engineering (CDE). CDE provides native Apache Iceberg Table Format support in its Spark Runtimes. This means you can create and interact with Iceberg Table format tables without any configurations.
 
-## Abstract
+Iceberg time travel is a feature that allows data engineers to query historical snapshots of a table at a specific point in time or by snapshot ID. Unlike traditional Hive tables, where changes overwrite data in place, Iceberg maintains a versioned history of all changes, including inserts, updates, and deletes.
 
-CDP Data Engineering (CDE) is the only cloud-native service purpose-built for enterprise data engineering teams. Building on Apache Spark, Data Engineering is an all-inclusive data engineering toolset that enables orchestration automation with Apache Airflow, advanced pipeline monitoring, visual troubleshooting, and comprehensive management tools to streamline ETL processes across enterprise analytics teams.
-
-Apache Iceberg is an open table format format for huge analytic datasets. It provides features that, coupled with Spark as the compute engine, allows you to build data processing pipelines with dramatic gains in terms of scalability, performance, and overall developer productivity.
-
-Iceberg is natively supported by CDE. Any time a CDE Spark Job or Session is created, Iceberg dependencies are automatically set in the SparkSession without any need for configurations. As a CDP User, the CDE Data Engineer can thus create, read, modify, and interact with Iceberg tables as allowed by Ranger policies, whether these were created in Cloudera Data Warehouse (CDW), DataHub, or Cloudera AI (CML).
-
-In this tutorial you will create a CDE Session and interact with Apache Iceberg tables using PySpark.
+CDE Spark Data Engineers use Iceberg Time Travel to reproduce past reports, debug issues, or recover accidentally deleted data by simply specifying the desired timestamp or snapshot when reading the table in PySpark.
 
 ## Requirements
 
@@ -112,3 +106,27 @@ The output of the incremental read reflects the rows that have changed between t
 spark.sql("DROP TABLE SPARK_CATALOG.DEFAULT.CELL_TOWERS_LEFT_{} PURGE;".format(USERNAME))
 spark.sql("DROP TABLE SPARK_CATALOG.DEFAULT.CELL_TOWERS_RIGHT_{} PURGE;".format(USERNAME))
 ```
+
+## Summary
+
+In this tutorial you learned how to run an Incremental Read with Iceberg Time Travel. In this specific case, the Incremental Read allowed you to query an Iceberg Table for the rows that changed in between two operations. In general, Time travel is particularly valuable in data engineering workflows for auditing, reproducibility, and safe experimentation on evolving datasets.
+
+## Next Steps
+
+Here is a list of helpful articles and blogs related to Cloudera Data Engineering and Apache Iceberg:
+
+- **Cloudera on Public Cloud 5-Day Free Trial**
+   Experience Cloudera Data Engineering through common use cases that also introduce you to the platform’s fundamentals and key capabilities with predefined code samples and detailed step by step instructions.
+   [Try Cloudera on Public Cloud for free](https://www.cloudera.com/products/cloudera-public-cloud-trial.html?utm_medium=sem&utm_source=google&keyplay=ALL&utm_campaign=FY25-Q2-GLOBAL-ME-PaidSearch-5-Day-Trial%20&cid=701Hr000001fVx4IAE&gad_source=1&gclid=EAIaIQobChMI4JnvtNHciAMVpAatBh2xRgugEAAYASAAEgLke_D_BwE)
+
+- **Cloudera Blog: Supercharge Your Data Lakehouse with Apache Iceberg**  
+   Learn how Apache Iceberg integrates with Cloudera Data Platform (CDP) to enable scalable and performant data lakehouse solutions, covering features like in-place table evolution and time travel.  
+   [Read more on Cloudera Blog](https://blog.cloudera.com/supercharge-your-data-lakehouse-with-apache-iceberg-in-cloudera-data-platform/)
+
+- **Cloudera Docs: Using Apache Iceberg in Cloudera Data Engineering**  
+   This documentation explains how Apache Iceberg is utilized in Cloudera Data Engineering to handle massive datasets, with detailed steps on managing tables and virtual clusters.  
+   [Read more in Cloudera Documentation](https://docs.cloudera.com/data-engineering/cloud/manage-jobs/topics/cde-using-iceberg.html)
+
+- **Cloudera Blog: Building an Open Data Lakehouse Using Apache Iceberg**  
+   This article covers how to build and optimize a data lakehouse architecture using Apache Iceberg in CDP, along with advanced features like partition evolution and time travel queries.  
+   [Read more on Cloudera Blog](https://blog.cloudera.com/how-to-use-apache-iceberg-in-cdp-open-lakehouse/)
